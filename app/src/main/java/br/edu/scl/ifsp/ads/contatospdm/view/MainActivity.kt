@@ -1,16 +1,20 @@
 package br.edu.scl.ifsp.ads.contatospdm.view
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.ArrayAdapter
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import br.edu.scl.ifsp.ads.contatospdm.R
 import br.edu.scl.ifsp.ads.contatospdm.databinding.ActivityMainBinding
+import br.edu.scl.ifsp.ads.contatospdm.model.Constant.EXTRA_CONTACT
 import br.edu.scl.ifsp.ads.contatospdm.model.Contact
 
 class MainActivity : AppCompatActivity() {
-    //View
+    //ViewBinding
     private val amb: ActivityMainBinding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
     }
@@ -26,11 +30,28 @@ class MainActivity : AppCompatActivity() {
             }
         )
     }
+
+    //ARL
+    private lateinit var carl: ActivityResultLauncher<Intent>
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(amb.root)
         fillContacts()
         amb.contatoslv.adapter=contactAdapter
+
+        carl = registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ){result ->
+            if (result.resultCode == RESULT_OK){
+                val contact =result.data?.getParcelableExtra<Contact>(EXTRA_CONTACT)
+                contact?.let { _contact ->
+                    contactList.add(_contact)
+                    contactAdapter.add(_contact.name)
+                    contactAdapter.notifyDataSetChanged()
+                }
+            }
+        }
 
     }
 
@@ -42,7 +63,7 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when(item.itemId){
             R.id.addContactMi -> {
-                //abrir tela ContactActivity p/ add novo contato
+                carl.launch(Intent(this,ContactActivity::class.java))
                 true
             }
             else -> true
