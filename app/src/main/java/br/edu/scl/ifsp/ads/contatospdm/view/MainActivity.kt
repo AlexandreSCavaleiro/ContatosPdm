@@ -37,7 +37,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(amb.root)
-        fillContacts()
+        //fillContacts()
         amb.contatoslv.adapter=contactAdapter
 
         carl = registerForActivityResult(
@@ -69,7 +69,7 @@ class MainActivity : AppCompatActivity() {
             else -> true
         }
     }
-
+    /*
     //função será deletada futuramente
     //é somente uma função para trazer contatos para a lista msm
     private fun fillContacts(){
@@ -85,5 +85,6 @@ class MainActivity : AppCompatActivity() {
             )
         }
     }
+    */
 
 }
