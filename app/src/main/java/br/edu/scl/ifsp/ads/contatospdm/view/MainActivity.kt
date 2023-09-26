@@ -5,11 +5,10 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.ArrayAdapter
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.widget.Toolbar
 import br.edu.scl.ifsp.ads.contatospdm.R
+import br.edu.scl.ifsp.ads.contatospdm.adapter.ContactAdapter
 import br.edu.scl.ifsp.ads.contatospdm.databinding.ActivityMainBinding
 import br.edu.scl.ifsp.ads.contatospdm.model.Constant.EXTRA_CONTACT
 import br.edu.scl.ifsp.ads.contatospdm.model.Contact
@@ -23,12 +22,10 @@ class MainActivity : AppCompatActivity() {
     private val contactList: MutableList<Contact> = mutableListOf()
 
     //Adapter
-    private val contactAdapter: ArrayAdapter<String> by lazy {
-        ArrayAdapter(this,
-            android.R.layout.simple_list_item_1,
-            contactList.map {contact ->
-                contact.name
-            }
+    private val contactAdapter: ContactAdapter by lazy {
+        ContactAdapter(
+            this,
+            contactList
         )
     }
 
@@ -40,7 +37,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(amb.root)
 
         setSupportActionBar(amb.toolbarIn.toolbar)
-        fillContacts()
+        //fillContacts()
         amb.contatoslv.adapter=contactAdapter
 
         carl = registerForActivityResult(
@@ -50,7 +47,6 @@ class MainActivity : AppCompatActivity() {
                 val contact =result.data?.getParcelableExtra<Contact>(EXTRA_CONTACT)
                 contact?.let { _contact ->
                     contactList.add(_contact)
-                    contactAdapter.add(_contact.name)
                     contactAdapter.notifyDataSetChanged()
                 }
             }
@@ -75,7 +71,7 @@ class MainActivity : AppCompatActivity() {
 
     //função será deletada futuramente
     //é somente uma função para trazer contatos para a lista msm
-    private fun fillContacts(){
+    /*private fun fillContacts(){
         for (i in 1..50){
             contactList.add(
                 Contact(
@@ -87,5 +83,5 @@ class MainActivity : AppCompatActivity() {
                 )
             )
         }
-    }
+    }*/
 }
