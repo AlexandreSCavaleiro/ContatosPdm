@@ -8,6 +8,7 @@ import android.view.MenuItem
 import android.widget.ArrayAdapter
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.widget.Toolbar
 import br.edu.scl.ifsp.ads.contatospdm.R
 import br.edu.scl.ifsp.ads.contatospdm.databinding.ActivityMainBinding
 import br.edu.scl.ifsp.ads.contatospdm.model.Constant.EXTRA_CONTACT
@@ -37,7 +38,9 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(amb.root)
-        //fillContacts()
+
+        setSupportActionBar(amb.toolbarIn.toolbar)
+        fillContacts()
         amb.contatoslv.adapter=contactAdapter
 
         carl = registerForActivityResult(
@@ -69,7 +72,7 @@ class MainActivity : AppCompatActivity() {
             else -> true
         }
     }
-    /*
+
     //função será deletada futuramente
     //é somente uma função para trazer contatos para a lista msm
     private fun fillContacts(){
@@ -85,6 +88,4 @@ class MainActivity : AppCompatActivity() {
             )
         }
     }
-    */
-
 }
