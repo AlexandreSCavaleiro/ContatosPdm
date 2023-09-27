@@ -3,7 +3,6 @@ package br.edu.scl.ifsp.ads.contatospdm.view
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import br.edu.scl.ifsp.ads.contatospdm.R
 import br.edu.scl.ifsp.ads.contatospdm.databinding.ActivityContactBinding
 import br.edu.scl.ifsp.ads.contatospdm.model.Constant.EXTRA_CONTACT
 import br.edu.scl.ifsp.ads.contatospdm.model.Contact
@@ -21,10 +20,22 @@ class ContactActivity : AppCompatActivity() {
         setSupportActionBar(acb.toolbarIn.toolbar)
         supportActionBar?.subtitle="Contact details"
 
+        val receivedContact = intent.getParcelableExtra<Contact>(EXTRA_CONTACT)
+        receivedContact?.let { _receivedContact ->
+            with(acb){
+                nameEt.setText(_receivedContact.name)
+                addressEt.setText(_receivedContact.address)
+                phoneEt.setText(_receivedContact.phone)
+                emailEt.setText(_receivedContact.email)
+
+            }
+
+        }
+
         with (acb) {
             saveBt.setOnClickListener {
                 val contact: Contact = Contact(
-                    id = generateId(),
+                    id = receivedContact?.id?:generateId(),// se o id n for nulo gera id
                     name = nameEt.text.toString(),
                     address = addressEt.text.toString(),
                     phone = phoneEt.text.toString(),
