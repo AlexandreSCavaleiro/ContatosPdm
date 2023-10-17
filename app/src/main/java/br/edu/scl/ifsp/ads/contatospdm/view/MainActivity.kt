@@ -7,13 +7,13 @@ import android.view.ContextMenu
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.View.OnClickListener
 import android.widget.AdapterView.AdapterContextMenuInfo
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import br.edu.scl.ifsp.ads.contatospdm.R
 import br.edu.scl.ifsp.ads.contatospdm.adapter.ContactAdapter
+import br.edu.scl.ifsp.ads.contatospdm.controller.ContactController
 import br.edu.scl.ifsp.ads.contatospdm.databinding.ActivityMainBinding
 import br.edu.scl.ifsp.ads.contatospdm.model.Constant.EXTRA_CONTACT
 import br.edu.scl.ifsp.ads.contatospdm.model.Constant.VIEW_CONTACT
@@ -25,8 +25,14 @@ class MainActivity : AppCompatActivity() {
         ActivityMainBinding.inflate(layoutInflater)
     }
     //Data Source
-    private val contactList: MutableList<Contact> = mutableListOf()
+    private val contactList: MutableList<Contact> by lazy {
+        contactController.getContacts()
+    }
 
+    // Controller
+    private val contactController: ContactController by lazy {
+        ContactController(this)
+    }
     //Adapter
     private val contactAdapter: ContactAdapter by lazy {
         ContactAdapter(
@@ -55,9 +61,20 @@ class MainActivity : AppCompatActivity() {
                     if(contactList.any { it.id == contact.id }){
                         val position = contactList.indexOfFirst { it.id == contact.id }
                         contactList[position] = _contact
+                        contactController.editContact(_contact)
                     }else {
-                        contactList.add(_contact)
+                        val newId = contactController.insertContact(_contact)
+                        val newContact = Contact (
+                            newId,
+                            _contact.name,
+                            _contact.address,
+                            _contact.phone,
+                            _contact.email
+                        )
+                        contactList.add(newContact)
+
                     }
+                    contactList.sortBy { it.name }
                     contactAdapter.notifyDataSetChanged()
                 }
             }
@@ -66,8 +83,9 @@ class MainActivity : AppCompatActivity() {
         amb.contatoslv.setOnItemClickListener{parent,view, position,id->
             val contact = contactList[position]
             val viewContactIntent = Intent(this, ContactActivity::class.java)
-            viewContactIntent.putExtra(EXTRA_CONTACT, contact)
-            viewContactIntent.putExtra(VIEW_CONTACT,true)
+                .putExtra(EXTRA_CONTACT, contact)
+                .putExtra(VIEW_CONTACT,true)
+
             startActivity(viewContactIntent)
         }
 
@@ -99,17 +117,20 @@ class MainActivity : AppCompatActivity() {
 
     override fun onContextItemSelected(item: MenuItem): Boolean {
         val position = (item.menuInfo as AdapterContextMenuInfo).position
+        val contact = contactList[position]
+
         return when (item.itemId){
             R.id.removeContactMi -> {
+                contactController.removeContact(contact.id)
                 contactList.removeAt(position)
                 contactAdapter.notifyDataSetChanged()
                 Toast.makeText(this,"Removido", Toast.LENGTH_SHORT).show()
                 true
             }
             R.id.editContactMo -> {
-                val contact = contactList[position]
+                val contactToEdit = contactList[position]
                 val editContactIntent = Intent(this, ContactActivity::class.java)
-                editContactIntent.putExtra(EXTRA_CONTACT, contact)
+                editContactIntent.putExtra(EXTRA_CONTACT, contactToEdit)
                 carl.launch(editContactIntent)
                 true
             }

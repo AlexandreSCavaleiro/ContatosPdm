@@ -36,8 +36,8 @@ class ContactAdapter(context: Context, private val contactList: MutableList<Cont
         holder.emailTv.setText(contact.email)
 
 
-        tcb?.nameTV?.setText(contact.name)
-        tcb?.emailTV?.setText(contact.email)
+        tcb?.nameTV?.text = contact.name
+        tcb?.emailTV?.text = contact.email
 
         return contactTileView
     }
