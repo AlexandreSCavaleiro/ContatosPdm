@@ -14,6 +14,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import br.edu.scl.ifsp.ads.contatospdm.R
 import br.edu.scl.ifsp.ads.contatospdm.adapter.ContactAdapter
 import br.edu.scl.ifsp.ads.contatospdm.controller.ContactController
+import br.edu.scl.ifsp.ads.contatospdm.controller.ContactRoomController
 import br.edu.scl.ifsp.ads.contatospdm.databinding.ActivityMainBinding
 import br.edu.scl.ifsp.ads.contatospdm.model.Constant.EXTRA_CONTACT
 import br.edu.scl.ifsp.ads.contatospdm.model.Constant.VIEW_CONTACT
@@ -24,14 +25,13 @@ class MainActivity : AppCompatActivity() {
     private val amb: ActivityMainBinding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
     }
+
     //Data Source
-    private val contactList: MutableList<Contact> by lazy {
-        contactController.getContacts()
-    }
+    private val contactList: MutableList<Contact> = mutableListOf()
 
     // Controller
-    private val contactController: ContactController by lazy {
-        ContactController(this)
+    private val contactController: ContactRoomController by lazy {
+        ContactRoomController(this)
     }
     //Adapter
     private val contactAdapter: ContactAdapter by lazy {
@@ -56,26 +56,13 @@ class MainActivity : AppCompatActivity() {
             ActivityResultContracts.StartActivityForResult()
         ){result ->
             if (result.resultCode == RESULT_OK){
-                val contact =result.data?.getParcelableExtra<Contact>(EXTRA_CONTACT)
+                val contact = result.data?.getParcelableExtra<Contact>(EXTRA_CONTACT)
                 contact?.let { _contact ->
                     if(contactList.any { it.id == contact.id }){
-                        val position = contactList.indexOfFirst { it.id == contact.id }
-                        contactList[position] = _contact
                         contactController.editContact(_contact)
                     }else {
-                        val newId = contactController.insertContact(_contact)
-                        val newContact = Contact (
-                            newId,
-                            _contact.name,
-                            _contact.address,
-                            _contact.phone,
-                            _contact.email
-                        )
-                        contactList.add(newContact)
-
+                        contactController.insertContact(_contact)
                     }
-                    contactList.sortBy { it.name }
-                    contactAdapter.notifyDataSetChanged()
                 }
             }
         }
@@ -90,6 +77,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         registerForContextMenu(amb.contatoslv)
+        contactController.getContacts()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -121,9 +109,7 @@ class MainActivity : AppCompatActivity() {
 
         return when (item.itemId){
             R.id.removeContactMi -> {
-                contactController.removeContact(contact.id)
-                contactList.removeAt(position)
-                contactAdapter.notifyDataSetChanged()
+                contactController.removeContact(contact)
                 Toast.makeText(this,"Removido", Toast.LENGTH_SHORT).show()
                 true
             }
@@ -143,19 +129,10 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
         unregisterForContextMenu(amb.contatoslv)
     }
-    //função será deletada futuramente
-    //é somente uma função para trazer contatos para a lista msm
-    /*private fun fillContacts(){
-        for (i in 1..50){
-            contactList.add(
-                Contact(
-                    i,
-                    "Nome $i",
-                    "endereço $i",
-                    "99$i",
-                    "email$i@gmail.com"
-                )
-            )
-        }
-    }*/
+
+    fun updateContactList(_contactList: MutableList<Contact>){
+        contactList.clear()
+        contactList.addAll(_contactList)
+        contactAdapter.notifyDataSetChanged()
+    }
 }
