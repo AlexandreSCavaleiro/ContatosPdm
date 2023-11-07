@@ -3,6 +3,9 @@ package br.edu.scl.ifsp.ads.contatospdm.view
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.os.Message
 import android.view.ContextMenu
 import android.view.Menu
 import android.view.MenuItem
@@ -13,9 +16,9 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import br.edu.scl.ifsp.ads.contatospdm.R
 import br.edu.scl.ifsp.ads.contatospdm.adapter.ContactAdapter
-import br.edu.scl.ifsp.ads.contatospdm.controller.ContactController
 import br.edu.scl.ifsp.ads.contatospdm.controller.ContactRoomController
 import br.edu.scl.ifsp.ads.contatospdm.databinding.ActivityMainBinding
+import br.edu.scl.ifsp.ads.contatospdm.model.Constant.CONTACT_ARRAY
 import br.edu.scl.ifsp.ads.contatospdm.model.Constant.EXTRA_CONTACT
 import br.edu.scl.ifsp.ads.contatospdm.model.Constant.VIEW_CONTACT
 import br.edu.scl.ifsp.ads.contatospdm.model.Contact
@@ -39,6 +42,20 @@ class MainActivity : AppCompatActivity() {
             this,
             contactList
         )
+    }
+
+    //Handler
+    val updateContactListHandler = object: Handler(Looper.getMainLooper()){
+        override fun handleMessage(msg: Message) {
+            super.handleMessage(msg)
+            msg.data.getParcelableArray(CONTACT_ARRAY)?.also {contactArray ->
+                contactList.clear()
+                contactArray.forEach{
+                    contactList.add(it as Contact)
+                }
+                contactAdapter.notifyDataSetChanged()
+            }
+        }
     }
 
     //ARL
@@ -130,9 +147,4 @@ class MainActivity : AppCompatActivity() {
         unregisterForContextMenu(amb.contatoslv)
     }
 
-    fun updateContactList(_contactList: MutableList<Contact>){
-        contactList.clear()
-        contactList.addAll(_contactList)
-        contactAdapter.notifyDataSetChanged()
-    }
 }

@@ -1,7 +1,8 @@
 package br.edu.scl.ifsp.ads.contatospdm.controller
 
-import android.os.AsyncTask
+import android.os.Message
 import androidx.room.Room
+import br.edu.scl.ifsp.ads.contatospdm.model.Constant.CONTACT_ARRAY
 import br.edu.scl.ifsp.ads.contatospdm.model.Contact
 import br.edu.scl.ifsp.ads.contatospdm.model.ContactRoomDao
 import br.edu.scl.ifsp.ads.contatospdm.model.ContactRoomDao.Companion.CONTACT_DATABASE_FILE
@@ -26,6 +27,20 @@ class ContactRoomController(private val mainActivity: MainActivity) {
 
     fun getContact(id: Int) = contactDaoImpl.retrieveContact(id)
 
+    fun getContacts(){
+        Thread{
+            val returnList = contactDaoImpl.retrieveContacts()
+
+            val message = Message()
+            message.data.putParcelableArray(
+                CONTACT_ARRAY,
+                returnList.toTypedArray()
+            )
+            mainActivity.updateContactListHandler.sendMessage(message)
+        }.start()
+    }
+
+    /*
     fun getContacts() {
         object: AsyncTask<Unit, Unit, MutableList<Contact>>(){
             override fun doInBackground(vararg params: Unit?): MutableList<Contact> {
@@ -40,6 +55,7 @@ class ContactRoomController(private val mainActivity: MainActivity) {
             }
         }.execute()
     }
+    */
 
     fun editContact(contact: Contact){
         Thread {
