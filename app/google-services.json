@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "52772367926",
+    "project_id": "contatospdmbackend-91a29",
+    "storage_bucket": "contatospdmbackend-91a29.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:52772367926:android:0dfc82bf845a30a1da3297",
+        "android_client_info": {
+          "package_name": "br.edu.scl.ifsp.ads.contatospdm"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAibr1kXP3SrcVX2HhoDy0sOuEZIcikSLM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
