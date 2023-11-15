@@ -14,6 +14,7 @@ import android.widget.AdapterView.AdapterContextMenuInfo
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import br.edu.scl.ifsp.ads.contatospdm.Controller.ContactRtDbFbController
 import br.edu.scl.ifsp.ads.contatospdm.R
 import br.edu.scl.ifsp.ads.contatospdm.adapter.ContactAdapter
 import br.edu.scl.ifsp.ads.contatospdm.controller.ContactRoomController
@@ -32,9 +33,10 @@ class MainActivity : AppCompatActivity() {
     //Data Source
     private val contactList: MutableList<Contact> = mutableListOf()
 
+
     // Controller
-    private val contactController: ContactRoomController by lazy {
-        ContactRoomController(this)
+    private val contactController: ContactRtDbFbController by lazy {
+        ContactRtDbFbController(this)
     }
     //Adapter
     private val contactAdapter: ContactAdapter by lazy {
@@ -44,16 +46,32 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
+    companion object{
+        const val GET_CONTACTS_MSG = 1
+        const val GET_CONTACTS_INTERVAL = 2000L
+    }
+
     //Handler
     val updateContactListHandler = object: Handler(Looper.getMainLooper()){
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
-            msg.data.getParcelableArray(CONTACT_ARRAY)?.also {contactArray ->
-                contactList.clear()
-                contactArray.forEach{
-                    contactList.add(it as Contact)
+
+            //BUSCA CONTTS OU ATUALIZA LISTA CONFORME A CONST NA MSG
+            if(msg.what== GET_CONTACTS_MSG){
+                //Busca contts de acordo com o interv e agenda nova busca
+                contactController.getContacts()
+                sendMessageDelayed(
+                    obtainMessage().apply { what = GET_CONTACTS_MSG },
+                    GET_CONTACTS_INTERVAL
+                )
+            } else {
+                msg.data.getParcelableArray(CONTACT_ARRAY)?.also {contactArray ->
+                    contactList.clear()
+                    contactArray.forEach{
+                        contactList.add(it as Contact)
+                    }
+                    contactAdapter.notifyDataSetChanged()
                 }
-                contactAdapter.notifyDataSetChanged()
             }
         }
     }
@@ -94,7 +112,12 @@ class MainActivity : AppCompatActivity() {
         }
 
         registerForContextMenu(amb.contatoslv)
-        contactController.getContacts()
+        updateContactListHandler.apply {
+            sendMessageDelayed(
+                obtainMessage().apply { what = GET_CONTACTS_MSG },
+                GET_CONTACTS_INTERVAL
+            )
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
