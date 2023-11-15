@@ -1,6 +1,7 @@
 package br.edu.scl.ifsp.ads.contatospdm.model
 
 
+import android.util.Log
 import com.google.firebase.Firebase
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
@@ -51,11 +52,11 @@ class ContactDaoRtDbFb: ContactDao {
             }
 
             override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
-                TODO("Not yet implemented")
+                //NSA
             }
 
             override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
+                Log.e("teste",error.toString())
             }
         })
 
